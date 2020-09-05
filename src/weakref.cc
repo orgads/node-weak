@@ -140,8 +140,7 @@ NAN_PROPERTY_ENUMERATOR(WeakPropertyEnumerator) {
 }
 
 /**
- * Weakref callback function. Invokes the "global" callback function,
- * which emits the _CB event on the per-object EventEmitter.
+ * Weakref callback function. Invokes the "global" callback function.
  */
 
 static void TargetCallback(const Nan::WeakCallbackInfo<proxy_container> &info) {
@@ -152,11 +151,7 @@ static void TargetCallback(const Nan::WeakCallbackInfo<proxy_container> &info) {
   Local<Value> argv[] = {
     Nan::New<Object>(cont->emitter)
   };
-  // Invoke callback directly, not via Nan::Callback->Call() which uses
-  // node::MakeCallback() which calls into process._tickCallback()
-  // too. Those other callbacks are not safe to run from here.
-  v8::Local<v8::Function> globalCallbackDirect = globalCallback->GetFunction();
-  globalCallbackDirect->Call(Nan::GetCurrentContext()->Global(), 1, argv);
+  Nan::Call(*globalCallback, 1, argv);
 
   // clean everything up
   Local<Object> proxy = Nan::New<Object>(cont->proxy);
@@ -177,7 +172,7 @@ NAN_METHOD(Create) {
 
   Local<Object> _target = info[0].As<Object>();
   Local<Object> _emitter = info[1].As<Object>();
-  Local<Object> proxy = Nan::New<ObjectTemplate>(proxyClass)->NewInstance();
+  Local<Object> proxy = Nan::NewInstance(Nan::New<ObjectTemplate>(proxyClass)).ToLocalChecked();
   cont->proxy.Reset(proxy);
   cont->emitter.Reset(_emitter);
   cont->target.Reset(_target);
@@ -222,23 +217,6 @@ NAN_METHOD(Get) {
   WEAKREF_FIRST_ARG
   if (!IsDead(proxy))
   info.GetReturnValue().Set(Unwrap(proxy));
-}
-
-/**
- * `isNearDeath(weakref)` JS function.
- */
-
-NAN_METHOD(IsNearDeath) {
-  WEAKREF_FIRST_ARG
-
-  proxy_container *cont = reinterpret_cast<proxy_container*>(
-    Nan::GetInternalFieldPointer(proxy, FIELD_INDEX_CONTAINER)
-  );
-  assert(cont != NULL);
-
-  Local<Boolean> rtn = Nan::New<Boolean>(cont->target.IsNearDeath());
-
-  info.GetReturnValue().Set(rtn);
 }
 
 /**
@@ -293,7 +271,6 @@ NAN_MODULE_INIT(Initialize) {
 
   Nan::SetMethod(target, "get", Get);
   Nan::SetMethod(target, "isWeakRef", IsWeakRef);
-  Nan::SetMethod(target, "isNearDeath", IsNearDeath);
   Nan::SetMethod(target, "isDead", IsDead);
   Nan::SetMethod(target, "_create", Create);
   Nan::SetMethod(target, "_getEmitter", GetEmitter);
