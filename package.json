@@ -3,7 +3,7 @@
   "contributors": [
     "Nathan Rajlich <nathan@tootallnate.net> (http://tootallnate.net)"
   ],
-  "name": "weak",
+  "name": "@audc/weak",
   "license": "MIT",
   "description": "Make weak references to JavaScript Objects.",
   "keywords": [
@@ -15,10 +15,10 @@
     "function",
     "callback"
   ],
-  "version": "1.0.1",
+  "version": "2.0.0",
   "repository": {
     "type": "git",
-    "url": "git://github.com/TooTallNate/node-weak.git"
+    "url": "https://github.com/orgads/node-weak"
   },
   "main": "lib/weak.js",
   "scripts": {
