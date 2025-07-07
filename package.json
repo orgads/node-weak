@@ -22,13 +22,16 @@
   },
   "main": "lib/weak.js",
   "scripts": {
+    "install": "prebuild-install || (npm run rebuild && node-gyp clean)",
+    "rebuild": "node-gyp rebuild --release -j max",
     "test": "mocha --expose-gc --reporter spec"
   },
   "dependencies": {
-    "bindings": "^1.5.0",
-    "nan": "^2.22.2"
+    "nan": "^2.22.2",
+    "prebuild-install": "^7.1.3"
   },
   "devDependencies": {
-    "mocha": "^11.7.1"
+    "mocha": "^11.7.1",
+    "prebuild": "^13.0.1"
   }
 }

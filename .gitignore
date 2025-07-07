@@ -1,3 +1,6 @@
-/node_modules
 /build
-/.lock-wscript
+/node_modules
+/docs/index.html
+/?.js
+/out/
+/prebuilds/
